@@ -205,3 +205,20 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# *.pt's
+*.pt
+
+# DS_Store
+*.DS_Store
+
+# Stupid .vscode
+.vscode
+
+# Ignore csv's
+*.csv
+
+# Ignore folders
+LunarLander*/
+BipedalWalker*/
+CarRacer*/
