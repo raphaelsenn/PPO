@@ -4,7 +4,7 @@ from typing import Tuple
 import torch
 import torch.nn as nn
 
-from src.actor_critic_base import ActorCriticContinuous
+from src.models import ActorCriticContinuous
 from src.utils import LOG_STD_MIN, LOG_STD_MAX
 
 

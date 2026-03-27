@@ -4,7 +4,7 @@ from typing import Tuple
 import torch
 import torch.nn as nn
 
-from src.actor_critic_base import ActorCriticDiscrete
+from src.models import ActorCriticDiscrete
 
 
 class ActorCriticDiscreteMLP(ActorCriticDiscrete):

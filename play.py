@@ -11,11 +11,13 @@ from src.factory import make_env, make_actor_critic
 def parse_args() -> Namespace:
     parser = ArgumentParser(description="Online Evaluation")
 
-    parser.add_argument("--env_id", type=str, default="BipedalWalker-v3")
+    parser.add_argument("--env_id", type=str, default="CarRacing-v3")
     parser.add_argument("--action_scale", type=float, default=1.0)
     parser.add_argument("--h1_dim", type=int, default=256)
     parser.add_argument("--h2_dim", type=int, default=256)
-    parser.add_argument("--weights", type=str, default="BipedalWalker-v3-PPO-Checkpoints-Seed2/BipedalWalker-v3-PPO-ActorCritic-Lr0.0003-t3000000-Seed2.pt")
+    parser.add_argument("--cnn_fc_in_dim", type=int, default=4096)
+    parser.add_argument("--weights", type=str, default="CarRacing-v3-PPO-ActorCritic-Lr0.0003-t3555328-Seed0.pt")
+    # parser.add_argument("--weights", type=str, default="BipedalWalker-v3-PPO-Checkpoints-Seed2/BipedalWalker-v3-PPO-ActorCritic-Lr0.0003-t3000000-Seed2.pt")
 
     parser.add_argument("--verbose", default=True)
 

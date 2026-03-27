@@ -4,18 +4,18 @@ import numpy as np
 import torch
 
 from src import PPO
-from src.factory import make_env, make_actor_critic
+from src import make_env, make_actor_critic
 
 
 def parse_args() -> Namespace:
     parser = ArgumentParser(description="PPO training")
 
-    parser.add_argument("--env_id", type=str, default="BipedalWalker-v3")
-    parser.add_argument("--num_timesteps", type=int, default=3_000_000)
+    parser.add_argument("--env_id", type=str, default="CarRacing-v3")
+    parser.add_argument("--num_timesteps", type=int, default=5_000_000)
     parser.add_argument("--device", type=str, default="cpu")
     parser.add_argument("--seed", type=int, default=0)
 
-    parser.add_argument("--n_envs", type=int, default=32)
+    parser.add_argument("--n_envs", type=int, default=8)
     parser.add_argument("--horizon", type=int, default=2048)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--n_epochs", type=int, default=4)
@@ -38,9 +38,12 @@ def parse_args() -> Namespace:
     parser.add_argument("--h1_dim", type=int, default=256)
     parser.add_argument("--h2_dim", type=int, default=256)
 
+    # CNN settings
+    parser.add_argument("--cnn_fc_in_dim", type=int, default=4096)          # Only for CNN
+
     # Visual settings
-    parser.add_argument("--frame_stack", type=int, default=4)
-    parser.add_argument("--resize", type=int, nargs=2, default=(84, 84))
+    parser.add_argument("--frame_stack", type=int, default=4)               # Only for CNN
+    parser.add_argument("--action_repeat", type=int, default=4)             # Only for CNN
 
     # Logging stuff
     parser.add_argument("--n_eval_runs", type=int, default=10)

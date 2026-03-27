@@ -1,4 +1,3 @@
-import copy
 import os
 from typing import Tuple
 
@@ -10,10 +9,10 @@ import torch.nn as nn
 
 import gymnasium as gym
 
-from src.actor_critic_base import ActorCritic 
+from src.models import ActorCritic 
 from src.replay_buffer import ReplayBuffer
-from src.utils import to_tensor
 from src.factory import Factory
+from src.utils import to_tensor
 
 
 class PPO:
@@ -56,6 +55,7 @@ class PPO:
 
         # Init neural networks
         self.actor_critic = actor_critic
+        self.actor_critic.to(self.device)
 
         # Cache actor-critic settings
         self.obs_shape = actor_critic.obs_shape
@@ -157,7 +157,7 @@ class PPO:
             a, log_probs, values = self.sample(s)                       # [n_envs, action_dim], [n_envs]
             s_nxt, reward, terminated, _, info = self.env.step(a)
 
-            # Handle episodic lifes and reward clipping
+            # Handle reward clipping
             reward = self._handle_reward(reward)                        # [n_envs]
             done = terminated                                           # [n_envs]
 

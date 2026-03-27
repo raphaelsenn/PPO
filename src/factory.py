@@ -3,32 +3,35 @@ from argparse import Namespace
 import gymnasium as gym
 from gymnasium import spaces
 
-from src.actor_critic_base import ActorCritic
-from src.actor_critic_continuous import (
+from src.models.actor_critic_base import ActorCritic
+from src.models.actor_critic_continuous import (
     ActorCriticContinuousMLP,
     ActorCriticContinuousCNN
 )
-from src.actor_critic_discrete import (
+from src.models.actor_critic_discrete import (
     ActorCriticDiscreteMLP,
     ActorCriticDiscreteCNN
 )
+from src.wrappers import ActionRepeat
 
 
 class Factory:
-    def __init__(self, env: gym.Env, n_envs: int=1, frame_stack: int=4) -> None:
+    def __init__(self, env: gym.Env, n_envs: int=1, frame_stack: int=4, action_repeat: int=4) -> None:
         self.env_id = env.spec.id
         self.observation_space = env.observation_space
         self.obs_shape = env.observation_space.shape 
         self.action_space = env.action_space
         self.n_envs = n_envs
         self.frame_stack = frame_stack
+        self.action_repeat = action_repeat
 
     def make_env(self, render_mode: str|None=None) -> gym.Env:
         if len(self.obs_shape) > 1: 
             env = gym.make(self.env_id, render_mode=render_mode)
             env = gym.wrappers.GrayscaleObservation(env)
-            env = gym.wrappers.ResizeObservation(env, shape=(84, 84))
+            # env = gym.wrappers.ResizeObservation(env, shape=(84, 84))
             env = gym.wrappers.FrameStackObservation(env, stack_size=self.frame_stack)
+            env = ActionRepeat(env, self.action_repeat) 
             return env  
         env = gym.make(self.env_id, render_mode=render_mode)
         return env
@@ -44,14 +47,14 @@ class Factory:
         return self.env_id
 
 
-def make_env(env_id: str, render_mode: str|None=None) -> gym.Env:
+def make_env(env_id: str, render_mode: str|None=None, frame_stack: int=4, action_repeat: int=4) -> gym.Env:
     env = gym.make(env_id, render_mode=render_mode)
     obs_shape = env.observation_space.shape
     if len(obs_shape) > 1: 
         env = gym.make(env_id, render_mode=render_mode)
         env = gym.wrappers.GrayscaleObservation(env)
-        env = gym.wrappers.ResizeObservation(env, shape=(84, 84))
-        env = gym.wrappers.FrameStackObservation(env, stack_size=4)
+        env = gym.wrappers.FrameStackObservation(env, stack_size=frame_stack)
+        env = ActionRepeat(env, action_repeat)
         return env  
     return env
 
@@ -67,6 +70,7 @@ def make_actor_critic(env: gym.Env, args: Namespace) -> ActorCritic:
     if not (is_discrete or is_continuous):
         raise ValueError(f"Unsupported action space: {act_space}")
 
+    # CNN path
     if len(obs_shape) > 1:
         if not isinstance(obs_space, spaces.Box):
             raise ValueError(f"CNN expects Box observation space, got: {obs_space}")
@@ -75,12 +79,14 @@ def make_actor_critic(env: gym.Env, args: Namespace) -> ActorCritic:
             return ActorCriticDiscreteCNN(
                 obs_shape=obs_shape,
                 action_dim=act_space.n,
+                fc_in_dim=args.cnn_fc_in_dim
             )
 
         return ActorCriticContinuousCNN(
             obs_shape=obs_shape,
             action_dim=act_space.shape[0],
             action_scale=float(act_space.high[0]),
+            fc_in_dim=args.cnn_fc_in_dim
         )
 
     # MLP path

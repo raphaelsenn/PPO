@@ -2,7 +2,7 @@ import torch
 import numpy as np
 
 import pytest
-from src.actor_critic_discrete import ActorCriticDiscreteMLP
+from src import ActorCriticDiscreteMLP
 
 
 @pytest.fixture
@@ -54,7 +54,7 @@ class TestActorCriticDiscreteMLP:
 
         assert action.shape == (64,)
         assert logprobs.shape == (64,)
-        assert values.shape == (64, 1)
+        assert values.shape == (64,)
 
     def test_act(self, actor_critic, state_np) -> None:
         action = actor_critic.act(state_np)
