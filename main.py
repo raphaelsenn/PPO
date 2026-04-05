@@ -8,31 +8,33 @@ from src import make_env, make_actor_critic
 
 
 def parse_args() -> Namespace:
+    """Settings for CarRacing-v3"""
     parser = ArgumentParser(description="PPO training")
 
     parser.add_argument("--env_id", type=str, default="CarRacing-v3")
     parser.add_argument("--num_timesteps", type=int, default=5_000_000)
-    parser.add_argument("--device", type=str, default="cpu")
+    parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--seed", type=int, default=0)
 
     parser.add_argument("--n_envs", type=int, default=8)
-    parser.add_argument("--horizon", type=int, default=2048)
+    parser.add_argument("--horizon", type=int, default=512)
     parser.add_argument("--batch_size", type=int, default=64)
-    parser.add_argument("--n_epochs", type=int, default=4)
+    parser.add_argument("--n_epochs", type=int, default=10)
 
-    parser.add_argument("--learning_rate", type=float, default=3e-4)
+    parser.add_argument("--learning_rate", type=float, default=0.00025)
     parser.add_argument("--gamma", type=float, default=0.99)
     parser.add_argument("--gae_lambda", type=float, default=0.95)
-    parser.add_argument("--clip_range", type=float, default=0.2)
+    parser.add_argument("--clip_range", type=float, default=0.1)
     parser.add_argument("--vf_coef", type=float, default=0.5)
-    parser.add_argument("--entropy_coef", type=float, default=0.0001)
+    parser.add_argument("--entropy_coef", type=float, default=0.001)
+    parser.add_argument("--decay_learning_rate", type=bool, default=True)   # Decays learning rate from `learing_rate` to 0.0
 
     parser.add_argument("--norm_advantages", type=bool, default=True)
     parser.add_argument("--clip_grad_norm", type=float, default=0.5)
     parser.add_argument("--weight_decay", type=float, default=0.0)
 
-    parser.add_argument("--obs_scale", type=float, default=None)
-    parser.add_argument("--reward_clip", type=float, default=None)
+    parser.add_argument("--obs_scale", type=float, default=255.0)
+    parser.add_argument("--reward_clip", type=float, default=1.0)
 
     # MLP settings
     parser.add_argument("--h1_dim", type=int, default=256)
@@ -40,10 +42,8 @@ def parse_args() -> Namespace:
 
     # CNN settings
     parser.add_argument("--cnn_fc_in_dim", type=int, default=4096)          # Only for CNN
-
-    # Visual settings
     parser.add_argument("--frame_stack", type=int, default=4)               # Only for CNN
-    parser.add_argument("--action_repeat", type=int, default=4)             # Only for CNN
+    parser.add_argument("--action_repeat", type=int, default=1)             # Only for CNN
 
     # Logging stuff
     parser.add_argument("--n_eval_runs", type=int, default=10)
@@ -63,7 +63,7 @@ def main() -> None:
     args = parse_args()
     set_seeds(args.seed)
 
-    env = make_env(args.env_id)
+    env = make_env(args.env_id, None, args.frame_stack, args.action_repeat)
     actor_critic = make_actor_critic(env, args)
 
     ppo = PPO(
@@ -85,6 +85,7 @@ def main() -> None:
         weight_decay=args.weight_decay,
         obs_scale=args.obs_scale,
         reward_clip=args.reward_clip,
+        decay_learning_rate=args.decay_learning_rate,
         n_eval_runs=args.n_eval_runs,
         eval_every=args.eval_every,
         save_every=args.save_every,

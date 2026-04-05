@@ -42,9 +42,10 @@ class PPO:
             entropy_coef: float,
             norm_advantages: bool=True,
             clip_grad_norm: float | None=None,
+            decay_learning_rate: bool=True,
             weight_decay: float=0.0,
-            obs_scale: float=1.0,
-            reward_clip: float=1.0,
+            obs_scale: float|None=None,
+            reward_clip: float|None=None,
             n_eval_runs: int=10,
             eval_every: int=5_000,
             save_every: int=10_000,
@@ -95,6 +96,12 @@ class PPO:
         self.vf_coef = vf_coef 
         self.entropy_coef = entropy_coef
         self.norm_advantages = norm_advantages
+        
+        # Decay learning rate linearly 
+        self.decay_learning_rate = decay_learning_rate
+        self.scheduler = torch.optim.lr_scheduler.LinearLR(
+            self.optimizer, start_factor=1, end_factor=0, total_iters=int(time_steps / (horizon * n_envs))
+        )
 
         # Evaluation and checkpoint settings 
         self.n_eval_runs = n_eval_runs
@@ -155,11 +162,12 @@ class PPO:
             s = self._obs                                               # [n_envs, *obs_shape]
 
             a, log_probs, values = self.sample(s)                       # [n_envs, action_dim], [n_envs]
-            s_nxt, reward, terminated, _, info = self.env.step(a)
+            s_nxt, reward, terminated, truncated, info = self.env.step(a)
 
             # Handle reward clipping
             reward = self._handle_reward(reward)                        # [n_envs]
-            done = terminated                                           # [n_envs]
+            # done = terminated                                           # [n_envs]
+            done = np.logical_or(terminated, truncated)
 
             value_nxt = self.get_value(s_nxt)                           # [n_envs]
             value_nxt = value_nxt * (1.0 - done.astype(np.float32))     # [n_envs]
@@ -258,6 +266,9 @@ class PPO:
         self.stats["std_return"].append(float(np.std(rewards)))
     
     def _handle_periodic_tasks(self, step: int) -> None:
+        if self.decay_learning_rate:
+            self.scheduler.step()
+
         if step >= self._next_eval_step:
             self._evaluate(step)
             average_return = self.stats["average_return"][-1]

@@ -34,13 +34,13 @@ class ActorCriticContinuousMLP(ActorCriticContinuous):
 
     def forward(self, s: torch.Tensor) -> Tuple:
         hs = self.mlp(s)            # [B, h2_dim]
+        value = self.critic(hs)     # [B, 1]
         
         mu = self.mu(hs)            # [B, action_dim]
         log_std = self.log_std(hs)  # [B, action_dim]
         log_std = torch.clamp(log_std, LOG_STD_MIN, LOG_STD_MAX) 
-        std = torch.exp(log_std)  
+        std = torch.exp(log_std)    # [B, action_dim]
         
-        value = self.critic(hs)   # [B, 1]
         return mu, std, value
 
     def pi(self, s: torch.Tensor) -> torch.Tensor:

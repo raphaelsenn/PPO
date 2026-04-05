@@ -87,26 +87,25 @@ ppo = PPO(
 
 All experiments (LunarLander-v3, BipedalWalker-v3 and CarRacer-v3) shared the following hyperparameters:
 
-| Hyperparameter | Value |
-| -------------- | ----- |
-| n_envs | 32 |
-| learning_rate | 0.0003 |
-| time_steps | 1e-6 |
-| horizon | 2048 |
-| n_epochs | 4 |
-| gamma | 0.99 |
-| GAE lambda | 0.95 |
-| clip_range | 0.2 |
-| clip_grad_norm | 0.5 |
-| entropy_coef | 0.001 |
-| vf_coef | 0.5 |
-
-LunarLander-v3 used 1e6 timesteps, Bipdealwalker-v3 used 3e-6 timesteps and CarRacing-v3 used 5e-6 timesteps and 8 envs.
+| Hyperparameter/Setting | LunarLander-v3 | BipedalWalker-v3 | CarRacing-v3 |
+| -------------- | ----- | ---- |  ----- |
+| n_envs | 1 | 1 | 8 |
+| learning_rate | 0.0003 | 0.0003 | 0.00025 | 
+| time_steps | 1e-6 | 1e-6 | 5e+6 |
+| horizon | 2048 | 2048 | 512 |
+| n_epochs | 10 | 10 | 10 |
+| gamma | 0.99 | 0.99 | 0.99 |
+| GAE lambda | 0.95 | 0.95 | 0.95 |
+| clip_range | 0.2 | 0.1| 0.1 |
+| clip_grad_norm | 0.5 | 0.1 | 0.5 |
+| entropy_coef | 0.0 | 0.0 | 0.001 |
+| vf_coef | 0.5 | 0.5 | 0.5 |
+| Clip reward | None | +/-10.0 | +/- 1.0 |
 
 | Environment | Average Return |
-| --  | -- | 
-| LunarLander-v3 |  261.31 ± 18.20 |
-| BipedalWalker-v3 | 272.79  ± 33.25 |
+| --  | -- |
+| LunarLander-v3 |  276.70 ± 3.42 |
+| BipedalWalker-v3 | 271.77  ± 16.85 |
 | CarRacing-v3 | TODO ± TODO |
 
 ## Citations

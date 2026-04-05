@@ -16,20 +16,30 @@ from src.wrappers import ActionRepeat
 
 
 class Factory:
-    def __init__(self, env: gym.Env, n_envs: int=1, frame_stack: int=4, action_repeat: int=4) -> None:
+    def __init__(self, env: gym.Env, n_envs: int=1) -> None:
         self.env_id = env.spec.id
         self.observation_space = env.observation_space
         self.obs_shape = env.observation_space.shape 
         self.action_space = env.action_space
         self.n_envs = n_envs
-        self.frame_stack = frame_stack
-        self.action_repeat = action_repeat
 
+        self.action_repeat = None
+        self.frame_stack = None
+        
+        curr = env
+        while hasattr(curr, "env"):
+            if hasattr(curr, "k_repeats"):
+                self.action_repeat = curr.k_repeats
+            
+            if hasattr(curr, "stack_size"): 
+                self.frame_stack = curr.stack_size
+
+            curr = curr.env
+    
     def make_env(self, render_mode: str|None=None) -> gym.Env:
         if len(self.obs_shape) > 1: 
             env = gym.make(self.env_id, render_mode=render_mode)
             env = gym.wrappers.GrayscaleObservation(env)
-            # env = gym.wrappers.ResizeObservation(env, shape=(84, 84))
             env = gym.wrappers.FrameStackObservation(env, stack_size=self.frame_stack)
             env = ActionRepeat(env, self.action_repeat) 
             return env  
