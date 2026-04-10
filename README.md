@@ -13,9 +13,7 @@ Figures: Learning curves for the three OpenAI Gym (Box2D) control tasks:
 
 * BipedalWalker-v3 (proprioceptive states, continuous action space)
 
-* CarRacing-v3 (visual states, continuous action space)
-
-The shaded region represents the standard deviation of the average evaluation over 2 trials (across 2 different seeds). Curves are smoothed with an average filter.
+The shaded region represents the standard deviation of the average evaluation over 10 trials (across 10 different seeds). Curves are smoothed with an average filter.
 
 *Note: This repository implements PPO for discrete and continuous action spaces. It also supports parallelization.*
 
@@ -39,10 +37,10 @@ The shaded region represents the standard deviation of the average evaluation ov
 
 ## Usage
 
-To train on an env of choice just run:
+To train on an env of choice (i.e. here LunarLander-v3) just run:
 
 ```bash
-python3 main.py --env_id=LunarLander-v3
+python3 main.py --env_id=LunarLander-v3 --horizon=2048 --n_timesteps=1000000 --learning_rate=0.0003 --batch_size=64 --entropy_coef=0.0
 ```
 
 Or:
@@ -87,8 +85,8 @@ ppo = PPO(
 
 All experiments (LunarLander-v3, BipedalWalker-v3 and CarRacer-v3) shared the following hyperparameters:
 
-| Hyperparameter/Setting | LunarLander-v3 | BipedalWalker-v3 | CarRacing-v3 |
-| -------------- | ----- | ---- |  ----- |
+| Hyperparameter/Setting | LunarLander-v3 | BipedalWalker-v3 |
+| -------------- | ----- | ---- |
 | n_envs | 1 | 1 | 8 |
 | learning_rate | 0.0003 | 0.0003 | 0.00025 | 
 | time_steps | 1e-6 | 1e-6 | 5e+6 |
@@ -106,7 +104,6 @@ All experiments (LunarLander-v3, BipedalWalker-v3 and CarRacer-v3) shared the fo
 | --  | -- |
 | LunarLander-v3 |  276.70 ± 3.42 |
 | BipedalWalker-v3 | 271.77  ± 16.85 |
-| CarRacing-v3 | TODO ± TODO |
 
 ## Citations
 

@@ -8,33 +8,33 @@ from src import make_env, make_actor_critic
 
 
 def parse_args() -> Namespace:
-    """Settings for CarRacing-v3"""
+    """Settings for LunarLander-v3"""
     parser = ArgumentParser(description="PPO training")
 
-    parser.add_argument("--env_id", type=str, default="CarRacing-v3")
-    parser.add_argument("--num_timesteps", type=int, default=5_000_000)
-    parser.add_argument("--device", type=str, default="cuda")
+    parser.add_argument("--env_id", type=str, default="LunarLander-v3")
+    parser.add_argument("--num_timesteps", type=int, default=1_000_000)
+    parser.add_argument("--device", type=str, default="cpu")
     parser.add_argument("--seed", type=int, default=0)
 
-    parser.add_argument("--n_envs", type=int, default=8)
-    parser.add_argument("--horizon", type=int, default=512)
+    parser.add_argument("--n_envs", type=int, default=1)
+    parser.add_argument("--horizon", type=int, default=2048)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--n_epochs", type=int, default=10)
 
-    parser.add_argument("--learning_rate", type=float, default=0.00025)
+    parser.add_argument("--learning_rate", type=float, default=0.0003)
     parser.add_argument("--gamma", type=float, default=0.99)
     parser.add_argument("--gae_lambda", type=float, default=0.95)
-    parser.add_argument("--clip_range", type=float, default=0.1)
+    parser.add_argument("--clip_range", type=float, default=0.2)
     parser.add_argument("--vf_coef", type=float, default=0.5)
-    parser.add_argument("--entropy_coef", type=float, default=0.001)
+    parser.add_argument("--entropy_coef", type=float, default=0.0)
     parser.add_argument("--decay_learning_rate", type=bool, default=True)   # Decays learning rate from `learing_rate` to 0.0
 
     parser.add_argument("--norm_advantages", type=bool, default=True)
     parser.add_argument("--clip_grad_norm", type=float, default=0.5)
     parser.add_argument("--weight_decay", type=float, default=0.0)
 
-    parser.add_argument("--obs_scale", type=float, default=255.0)
-    parser.add_argument("--reward_clip", type=float, default=1.0)
+    parser.add_argument("--obs_scale", type=float, default=None)
+    parser.add_argument("--reward_clip", type=float, default=None)
 
     # MLP settings
     parser.add_argument("--h1_dim", type=int, default=256)
