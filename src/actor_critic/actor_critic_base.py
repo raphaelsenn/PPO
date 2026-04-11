@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from src.utils import to_tensor, EPS
+from src.utils.utils import to_tensor, EPS
 
 
 class ActorCritic(nn.Module, ABC):

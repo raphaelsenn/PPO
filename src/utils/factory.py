@@ -3,16 +3,16 @@ from argparse import Namespace
 import gymnasium as gym
 from gymnasium import spaces
 
-from src.models.actor_critic_base import ActorCritic
-from src.models.actor_critic_continuous import (
+from src.actor_critic.actor_critic_base import ActorCritic
+from src.actor_critic.actor_critic_continuous import (
     ActorCriticContinuousMLP,
     ActorCriticContinuousCNN
 )
-from src.models.actor_critic_discrete import (
+from src.actor_critic.actor_critic_discrete import (
     ActorCriticDiscreteMLP,
     ActorCriticDiscreteCNN
 )
-from src.wrappers import ActionRepeat
+from src.utils.wrappers import ActionRepeat
 
 
 class Factory:

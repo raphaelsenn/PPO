@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 
-class ReplayBuffer:
+class RolloutBuffer:
     def __init__(
             self, 
             obs_shape: Tuple[int, ...],
@@ -127,7 +127,7 @@ class ReplayBuffer:
             else:
                 yield (
                     torch.as_tensor(obs[mb], dtype=torch.float32, device=self.device),              # [batch_size, *obs_shape]
-                    torch.as_tensor(actions[mb], dtype=torch.int32, device=self.device),            # [batch_size]
+                    torch.as_tensor(actions[mb], dtype=torch.long, device=self.device),             # [batch_size]
                     torch.as_tensor(log_probs[mb], dtype=torch.float32, device=self.device),        # [batch_size]
                     torch.as_tensor(advantages[mb], dtype=torch.float32, device=self.device),       # [batch_size]
                     torch.as_tensor(rtgs[mb], dtype=torch.float32, device=self.device),             # [batch_size]

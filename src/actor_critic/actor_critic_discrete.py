@@ -1,10 +1,9 @@
-import math
 from typing import Tuple
 
 import torch
 import torch.nn as nn
 
-from src.models import ActorCriticDiscrete
+from src.actor_critic.actor_critic_base import ActorCriticDiscrete
 
 
 class ActorCriticDiscreteMLP(ActorCriticDiscrete):

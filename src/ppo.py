@@ -9,9 +9,9 @@ import torch.nn as nn
 
 import gymnasium as gym
 
-from src.models import ActorCritic 
-from src.replay_buffer import ReplayBuffer
-from src.factory import Factory
+from src.actor_critic.actor_critic_base import ActorCritic 
+from src.rollout_buffer import RolloutBuffer
+from src.utils.factory import Factory
 from src.utils import to_tensor
 
 
@@ -73,8 +73,8 @@ class PPO:
         # Criterion
         self.criterion_vf = nn.MSELoss()
 
-        # Replay buffer
-        self.replay_buffer = ReplayBuffer(
+        # Rollout buffer
+        self.rollout_buffer = RolloutBuffer(
             self.obs_shape, self.action_dim, horizon,  n_envs, batch_size, norm_advantages, self.is_continuous, self.device
         )
 
@@ -153,7 +153,7 @@ class PPO:
 
     @torch.no_grad()
     def collect_data(self) -> None:
-        self.replay_buffer.reset()
+        self.rollout_buffer.reset()
 
         if self._obs is None:
             self._obs, info = self.env.reset(seed=self.seed)            # [n_envs, *obs_shape], dict
@@ -172,7 +172,7 @@ class PPO:
             value_nxt = self.get_value(s_nxt)                           # [n_envs]
             value_nxt = value_nxt * (1.0 - done.astype(np.float32))     # [n_envs]
 
-            self.replay_buffer.push(
+            self.rollout_buffer.push(
                 s, a, reward, log_probs, values, value_nxt, done
             )
             self._obs = s_nxt                                           # [n_envs, *obs_shape]
@@ -181,7 +181,7 @@ class PPO:
         self.actor_critic.train()
         clip_range = self.clip_range
         for _ in range(self.n_epochs):
-            for s, a, log_prob_old, adv, rtg in self.replay_buffer.minibatches(): 
+            for s, a, log_prob_old, adv, rtg in self.rollout_buffer.minibatches(): 
                 if self.obs_scale is not None: 
                     s = s.div(self.obs_scale) 
 
@@ -289,10 +289,10 @@ class PPO:
                 self._next_save_step += self.save_every
 
     def _compute_rtgs(self) -> None:
-        self.replay_buffer.compute_rtgs(self.gamma)
+        self.rollout_buffer.compute_rtgs(self.gamma)
 
     def _compute_advantages(self) -> None:
-        self.replay_buffer.compute_advantages(self.gamma, self.gae_lambda)
+        self.rollout_buffer.compute_advantages(self.gamma, self.gae_lambda)
 
     def _handle_reward(self, reward: np.ndarray) -> np.ndarray:
         if self.reward_clip is not None:
